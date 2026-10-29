@@ -1,16 +1,26 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const vm = require('node:vm');
 const ts = require('typescript');
 
-// Exercise the actual pure helpers without mounting React or using real bank data.
-// The helper tests do not run Vite, so supply an empty build environment.
-const source = fs.readFileSync('src/App.tsx', 'utf8').replaceAll('import.meta.env', '({})') + '\nexport { parseCsvText, parseOfx, discoverTransactionSections, findTemplatePlannedUpdates, prepareImports, detectImportSource, categorize, refreshSuggestions, sheetCategory, merchantKey, templateCategory, budgetRowKey, parseCategorySelection, categorySelection, categoryLabel, summarizeSpending, categoryGroup, budgetImpact, reconcileTransfers, migrateBookkeeping, transactionsForMonth, matchesCategoryFilter, SUMMARY_LAYOUT, summaryCategories, findFoodCategoryRepairs };';
-const compiled = ts.transpileModule(source, {
-  compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.React, esModuleInterop: true },
-}).outputText;
-const context = { exports: {}, require };
-vm.runInNewContext(compiled, context);
+// Load production TypeScript modules using the project's ES2020 target.
+const previousLoader = require.extensions['.ts'];
+require.extensions['.ts'] = (module, filename) => {
+  const source = fs.readFileSync(filename, 'utf8');
+  const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.CommonJS, esModuleInterop: true } }).outputText;
+  module._compile(compiled, filename);
+};
+let context;
+try {
+  context = { exports: {
+    ...require('../src/lib/imports.ts'),
+    ...require('../src/lib/categories.ts'),
+    ...require('../src/lib/ledger.ts'),
+    ...require('../src/lib/sheets.ts'),
+  } };
+} finally {
+  if (previousLoader) require.extensions['.ts'] = previousLoader;
+  else delete require.extensions['.ts'];
+}
 const { parseCsvText, parseOfx, discoverTransactionSections, findTemplatePlannedUpdates } = context.exports;
 
 const csv = parseCsvText('Date,Description,Debit,Credit,\n2026-10-01,Shop,12.50,,\n2026-10-02,Refund,,3.25,\n2026-10-03,Invalid,,,');

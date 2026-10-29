@@ -11,6 +11,31 @@ Requires Node.js 20 or newer.
 
 Run `npm test` for synthetic import and template-mapping regression checks, and `npm run build` for TypeScript validation and the production build.
 
+## Project layout
+
+```text
+src/
+  App.tsx             Page layout and component composition
+  components/         Navigation, overview, import, transactions, and connection panels
+  hooks/
+    useBudgetBridge.ts  Local ledger state, persistence, filters, and user actions
+    useGoogleSheets.ts  Connection state and monthly Sheets upload workflow
+  lib/
+    accounts.ts       Bank and account-type hints
+    imports.ts        CSV/OFX parsing, source detection, and batch imports
+    categories.ts     Local rules, category migration, and transfer matching
+    ledger.ts         Duplicate keys, month filtering, and overview totals
+    sheets.ts         Template categories, cell mapping, and upload repairs
+    format.ts         Shared date, amount, and text helpers
+    storage.ts        Reading saved browser data
+  services/google.ts  Google OAuth and authenticated Sheets HTTP requests
+  config.ts           Storage keys, template URL, and shared configuration
+  types.ts            Shared transaction and template types
+tests/regression.cjs   Regression checks importing the production helper modules
+```
+
+The refactor retains the existing browser storage keys, so saved ledgers and category rules remain compatible. OAuth tokens remain in memory, and transaction parsing and categorization remain local.
+
 Changing the Google client ID or destination requires reconnecting before uploading. All matching transactions are available for review in the Transactions view. Debit/credit CSV columns already define the money direction and are not flipped for credit cards. Existing browser storage keys are retained for compatibility.
 
 ## Import flow
