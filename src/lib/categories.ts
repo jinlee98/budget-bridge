@@ -116,6 +116,9 @@ export function categorize(description: string, rules: Record<string, string>, a
       return { ...selection, incomeCategory: selection.category === 'Income' ? selection.incomeCategory ?? inferIncomeCategory(description) : undefined, source: 'Rule' };
     }
   }
+  if (amount > 0 && /\bdr paul lee\b/.test(text)) {
+    return { category: 'Income', incomeCategory: 'Paycheck', source: 'Rule' };
+  }
   // Transfers take precedence over merchants (e.g. a card payment to a retailer).
   const cardName = /\b(visa|mastercard|master card|amex|american express|credit card|creditcard)\b/.test(text);
   const payment = /\b(payment|payments|pmt|pymt|thank you|thankyou|bill pay)\b/.test(text);

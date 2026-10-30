@@ -472,49 +472,72 @@ th, td { padding-top: 12px; padding-bottom: 12px; }
   .filter-select { max-width: 190px; }
 }
 
-/* Smaller laptops need room for the larger type without desktop-sized gutters. */
-@media (min-width: 901px) and (max-width: 1440px) {
-  .sidebar { width: 232px; padding: 22px 14px 16px; }
-  .main-content { margin-left: 232px; min-width: 0; }
-  .brand { gap: 8px; padding: 0 0 28px; }
-  .brand-name { font-size: 19px; }
-  .nav-item { gap: 10px; padding: 0 10px; }
-  .privacy-card { padding: 12px; margin-bottom: 12px; }
-  .privacy-card p { font-size: 13px; }
-  .topbar { height: 54px; padding: 0 24px; }
-  .page-wrap { padding: 24px 24px 20px; }
-  .welcome-row { gap: 16px; margin-bottom: 18px; }
-  h1 { font-size: 28px; letter-spacing: -.8px; }
-  .subtitle { max-width: 580px; font-size: 14px; line-height: 1.5; }
-  .step-strip { gap: 12px; padding: 10px 14px; min-height: 62px; }
-  .step { min-width: 140px; }
-  .step-note { display: none; }
-  .stats-grid { gap: 10px; margin: 12px 0; }
-  .stat-card { min-height: 96px; padding: 12px 14px; }
-  .stat-financial, .stat-spend { min-height: 118px; }
-  .stat-top { font-size: 11px; letter-spacing: .4px; }
-  .stat-number { margin: 8px 0 6px; font-size: 22px; }
-  .stat-sheet { font-size: 17px; }
-  .stat-foot { font-size: 12px; white-space: normal; line-height: 1.45; }
-  .content-grid { margin: 12px 0; }
-  .drop-zone { min-height: 150px; margin-top: 12px; }
+/* Keep secondary overview information out of the financial cards. */
+.overview-statusbar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 14px 4px 4px; }
+.overview-status-item { display: inline-flex; align-items: center; gap: 7px; padding: 4px 0; border: 0; background: transparent; color: var(--text-secondary); font-size: 13px; line-height: 1.5; text-align: left; }
+.overview-status-item strong { color: var(--ink); font-size: 15px; }
+.overview-status-item:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.overview-status-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
+
+/* MacBook display scaling can produce a CSS viewport above 1440px. */
+@media (min-width: 901px) and (max-width: 1600px) {
+  .sidebar { width: 104px; padding: 24px 10px 18px; align-items: center; }
+  .main-content { margin-left: 104px; min-width: 0; }
+  .brand { padding: 0 0 30px; }
+  .brand > div:last-child, .workspace-label, .privacy-card, .profile-copy, .avatar { display: none; }
+  .brand-mark { width: 36px; height: 36px; }
+  .side-nav { width: 100%; gap: 10px; }
+  .nav-item { height: 70px; padding: 10px 2px; flex-direction: column; justify-content: center; gap: 7px; }
+  .nav-item > span:not(.icon) { font-size: 11px; }
+  .nav-item .icon { font-size: 22px; }
+  .sidebar .nav-dot, .sidebar .nav-count { display: none; }
+  .nav-item.active:before { height: 26px; }
+  .sidebar-bottom { width: 100%; justify-content: center; border-top: 0; padding: 12px 0 0; }
+  .clear-data-button { display: grid; margin: 0; }
+  .topbar { height: 52px; padding: 0 32px; }
+  .page-wrap { max-width: 1280px; padding: 28px 32px; }
+  .welcome-row { gap: 24px; margin: 0 0 24px; align-items: center; }
+  h1 { font-size: 28px; letter-spacing: -.7px; }
+  .subtitle { max-width: 620px; font-size: 14px; line-height: 1.6; }
+  .step-strip { display: none; }
+  .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0 0 24px; }
+  .stat-card, .stat-financial, .stat-spend { min-height: 144px; padding: 20px; }
+  .stat-top { font-size: 11px; letter-spacing: .4px; line-height: 1.5; }
+  .stat-number { margin: 14px 0 10px; font-size: 24px; }
+  .stat-foot { font-size: 12px; white-space: normal; line-height: 1.5; }
+  .overview-statusbar { padding: 0 4px; gap: 12px 28px; }
+  .spending-breakdown { margin-bottom: 24px; }
+  .content-grid { margin: 20px 0; }
+  .import-panel, .connection-panel { padding: 22px; }
+  .drop-zone { min-height: 150px; margin-top: 16px; }
   .bank-links { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .bank-links a { font-size: 12px; }
-  .ledger-heading { flex-direction: column; align-items: stretch; gap: 14px; }
-  .table-tools { width: 100%; gap: 8px; }
-  .search-box { flex: 1 1 180px; min-width: 180px; }
-  .filter-select { flex: 0 1 190px; }
-  .pending-file { grid-template-columns: 35px minmax(150px, 1fr) minmax(120px, .7fr) minmax(120px, .7fr); }
+  .ledger-heading { flex-direction: column; align-items: stretch; gap: 20px; padding: 22px; }
+  .table-tools { display: flex; flex-wrap: wrap; width: 100%; gap: 12px; }
+  .search-box { flex: 1 1 200px; min-width: 180px; }
+  .filter-select { flex: 0 1 200px; max-width: 200px; }
+  .table-scroll { max-width: 100%; }
+  .table-scroll table { min-width: 1080px; }
+  th, td { padding-left: 12px; padding-right: 12px; }
+  .merchant-cell { min-width: 180px; }
+  .merchant-cell strong { max-width: 200px; white-space: normal; line-height: 1.4; }
+  .merchant-cell small { display: none; }
+  .budget-impact { max-width: 160px; white-space: normal; font-size: 11px; line-height: 1.4; }
+  .category-select { max-width: 170px; }
+  .pending-file { grid-template-columns: 35px minmax(150px, 1fr) minmax(120px, .7fr) minmax(120px, .7fr); padding: 14px; gap: 12px; }
   .file-row-actions { grid-column: 2 / -1; justify-content: flex-end; }
-  .sync-footer { flex-wrap: wrap; align-items: center; gap: 12px; }
+  .sync-footer { flex-wrap: wrap; align-items: center; gap: 16px; }
   .sync-footer > span { flex: 1 1 360px; font-size: 12px; }
 }
-@media (min-width: 901px) and (max-width: 1180px) {
-  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 901px) and (max-width: 1100px) {
+  .page-wrap { padding: 24px; }
+  .stat-card, .stat-financial, .stat-spend { padding: 16px; }
   .bank-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .overview-statusbar { flex-direction: column; gap: 6px; padding: 8px 2px; }
 }
 @media (max-height: 800px) and (min-width: 621px) {
   .sidebar { overflow-y: auto; }
   .sidebar-spacer { min-height: 16px; }
-  .privacy-card { margin-top: 16px; }
 }

@@ -90,7 +90,7 @@ export function TransactionsPanel({
           <tbody>
             {filteredTransactions.map((transaction) => (<tr key={transaction.id}>
               <td className="date-cell">{formatDate(transaction.date)}</td>
-              <td><div className="merchant-cell"><span className={'merchant-avatar merchant-' + (Math.abs(transaction.description.charCodeAt(0) || 0) % 5)}>{transaction.description.trim().charAt(0).toUpperCase() || '•'}</span><span><strong>{transaction.description}</strong><small>{transaction.postedDate && transaction.postedDate !== transaction.date ? 'Posted ' + formatDate(transaction.postedDate) : transaction.fileName}</small></span></div></td>
+              <td><div className="merchant-cell" title={transaction.description + ' - Imported from ' + transaction.fileName}><span className={'merchant-avatar merchant-' + (Math.abs(transaction.description.charCodeAt(0) || 0) % 5)}>{transaction.description.trim().charAt(0).toUpperCase() || '•'}</span><span><strong>{transaction.description}</strong><small>{transaction.postedDate && transaction.postedDate !== transaction.date ? 'Posted ' + formatDate(transaction.postedDate) : transaction.fileName}</small></span></div></td>
               <td><div className="account-cell"><span className="bank-mini">{transaction.institution === 'American Express' ? 'A' : transaction.institution.slice(0, 1)}</span>{transaction.accountName}</div></td>
               <td><select className={'category-select category-tone-' + categoryGroup(transaction.category)} value={categorySelection(transaction)} onChange={(event) => updateCategory(transaction, event.target.value)}>
                 <CategoryOptions />

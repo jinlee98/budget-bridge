@@ -6,6 +6,8 @@ type Props = Pick<
   | 'pending'
   | 'activeTab'
   | 'setActiveTab'
+  | 'setCategoryFilter'
+  | 'setSearch'
   | 'monthTransactions'
   | 'monthLabel'
   | 'spending'
@@ -18,6 +20,8 @@ export function OverviewStats({
   pending,
   activeTab,
   setActiveTab,
+  setCategoryFilter,
+  setSearch,
   monthTransactions,
   monthLabel,
   spending,
@@ -47,20 +51,16 @@ export function OverviewStats({
           : formatMoney(0)}</div>
         <div className="stat-foot"><span className={uncategorized ? 'stat-marker amber' : 'stat-marker green'}></span> {uncategorized ? 'Provisional: review uncategorized transactions' : 'Income minus net spending; not your bank balance'}</div>
       </div>
-      <div className="stat-card">
-        <div className="stat-top"><span>TRANSACTIONS IN LEDGER</span><span className="stat-icon">▤</span></div>
-        <div className="stat-number">{transactions.length.toLocaleString('en-CA')}</div>
-        <div className="stat-foot"><span className="stat-marker blue"></span> {monthTransactions.length} in {monthLabel}</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-top"><span>NEEDS A CATEGORY</span><span className="stat-icon">⌑</span></div>
-        <div className="stat-number">{uncategorized}</div>
-        <div className="stat-foot"><span className={uncategorized ? 'stat-marker amber' : 'stat-marker green'}></span> {uncategorized ? 'Review before syncing' : 'You’re all caught up'}</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-top"><span>SHEET CONNECTION</span><span className="stat-icon">↗</span></div>
-        <div className="stat-number stat-sheet">{sheetTitle || 'Not connected'}</div>
-        <div className="stat-foot"><span className={sheetTitle ? 'stat-marker green' : 'stat-marker muted'}></span> <button className="connection-shortcut" onClick={() => setActiveTab('connections')}>{sheetTitle ? 'Manage connection & upload' : 'Connect Google Sheets'}</button></div>
+      <div className="overview-statusbar">
+        <button className="overview-status-item" title={transactions.length + ' saved across all months'} onClick={() => { setActiveTab('transactions'); setCategoryFilter('All categories'); setSearch(''); }}>
+          <strong>{monthTransactions.length}</strong><span>transactions in {monthLabel}</span>
+        </button>
+        <button className="overview-status-item" onClick={() => { setActiveTab('transactions'); setCategoryFilter('Uncategorized'); setSearch(''); }}>
+          <span className={uncategorized ? 'stat-marker amber' : 'stat-marker green'}></span><strong>{uncategorized}</strong><span>{uncategorized ? 'need a category' : 'uncategorized'}</span>
+        </button>
+        <button className="overview-status-item" title={sheetTitle || 'Connect your monthly budget copy'} onClick={() => setActiveTab('connections')}>
+          <span className={sheetTitle ? 'stat-marker green' : 'stat-marker muted'}></span><span>{sheetTitle ? 'Sheet connected - manage & upload' : 'Connect Google Sheets'}</span>
+        </button>
       </div>
     </section>
   </>);

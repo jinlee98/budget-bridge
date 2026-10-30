@@ -25,13 +25,13 @@ export function Sidebar({
       </div>
       <div className="workspace-label">WORKSPACE</div>
       <nav className="side-nav" aria-label="Main navigation">
-        <button className={activeTab === 'overview' ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab('overview')}>
+        <button className={activeTab === 'overview' ? 'nav-item active' : 'nav-item'} title="Overview" aria-label="Overview" onClick={() => setActiveTab('overview')}>
           <Icon>◫</Icon><span>Overview</span><span className="nav-dot"></span>
         </button>
-        <button className={activeTab === 'transactions' ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab('transactions')}>
+        <button className={activeTab === 'transactions' ? 'nav-item active' : 'nav-item'} title="Transactions" aria-label="Transactions" onClick={() => setActiveTab('transactions')}>
           <Icon>▤</Icon><span>Transactions</span><span className="nav-count">{transactions.length || ''}</span>
         </button>
-        <button className={activeTab === 'connections' ? 'nav-item active' : 'nav-item'} onClick={() => setActiveTab('connections')}>
+        <button className={activeTab === 'connections' ? 'nav-item active' : 'nav-item'} title="Connections" aria-label="Connections" onClick={() => setActiveTab('connections')}>
           <Icon>⛓</Icon><span>Connections</span>
         </button>
       </nav>
