@@ -21,12 +21,22 @@ export function inspectCsv(text: string) {
     if (headerIndex >= 0)
       return { grid, headerIndex };
   }
-  return { grid: fallback, headerIndex: 0 };
+  return { grid: fallback, headerIndex: -1 };
+}
+
+// TD's accountactivity download omits headers: date, description, debit, credit, balance.
+export function isHeaderlessAccountCsv(grid: string[][]): boolean {
+  const valid = (row: string[]) => row.length === 5 &&
+    /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(row[0].trim()) && Boolean(parseDate(row[0])) && Boolean(row[1].trim()) &&
+    (!row[2].trim() || parseMoney(row[2]) !== null) && (!row[3].trim() || parseMoney(row[3]) !== null) &&
+    (parseMoney(row[2]) !== null || parseMoney(row[3]) !== null) && parseMoney(row[4]) !== null;
+  return grid.length > 0 && valid(grid[0]) && grid.filter(valid).length >= grid.length * 0.8;
 }
 
 export function detectImportSource(text: string, fileName: string, isOfx: boolean) {
   let metadata: string[];
   let headers: string[] = [];
+  let tdAccountLayout = false;
   if (isOfx) {
     // Read account/issuer metadata, never merchant names in transaction blocks.
     const prefix = text.split(/<STMTTRN>/i)[0];
@@ -38,8 +48,9 @@ export function detectImportSource(text: string, fileName: string, isOfx: boolea
   }
   else {
     const { grid, headerIndex } = inspectCsv(text);
-    headers = grid[headerIndex] ?? [];
-    metadata = grid.slice(0, headerIndex).flat();
+    tdAccountLayout = headerIndex < 0 && isHeaderlessAccountCsv(grid) && /^accountactivity(?:[\s(\d)]*)\.csv$/i.test(fileName);
+    headers = headerIndex >= 0 ? grid[headerIndex] ?? [] : [];
+    metadata = headerIndex >= 0 ? grid.slice(0, headerIndex).flat() : [];
     const metadataColumns = headers.map((header, index) => /^(bank|bank name|institution|financial institution|account type|account name|card type|product|product name)$/.test(normalizeText(header)) ? index : -1).filter((index) => index >= 0);
     for (const row of grid.slice(headerIndex + 1)) {
       for (const column of metadataColumns)
@@ -48,7 +59,7 @@ export function detectImportSource(text: string, fileName: string, isOfx: boolea
     }
   }
   const banks = [...new Set(metadata.map(inferInstitution).filter((bank) => bank !== 'Other'))];
-  const institution = banks.length === 1 ? banks[0] : banks.length > 1 ? 'Other' : inferInstitution(fileName);
+  const institution = banks.length === 1 ? banks[0] : banks.length > 1 ? 'Other' : tdAccountLayout ? 'TD' : inferInstitution(fileName);
   const accountSignals = metadata.join(' ').toLowerCase();
   const cardSignal = /\b(credit card|visa|mastercard|amex|american express|cobalt)\b/.test(accountSignals) ||
     headers.some((header) => /^(card number|card member|cardmember|cardmember name|credit card number)$/.test(normalizeText(header)));
@@ -57,7 +68,7 @@ export function detectImportSource(text: string, fileName: string, isOfx: boolea
   const fileBank = /\b(chequing|checking|savings)\b/.test(normalizeText(fileName));
   const accountKind: AccountKind = cardSignal !== bankSignal ? (cardSignal ? 'card' : 'bank')
     : !cardSignal && fileCard !== fileBank ? (fileCard ? 'card' : 'bank') : inferAccountKind(institution);
-  const bankEvidence = banks.length === 1 ? 'Bank from file contents' : banks.length > 1 ? 'Conflicting banks; choose bank' : institution !== 'Other' ? 'Bank from filename' : 'Bank not detected';
+  const bankEvidence = banks.length === 1 ? 'Bank from file contents' : banks.length > 1 ? 'Conflicting banks; choose bank' : tdAccountLayout ? 'TD-style accountactivity export; confirm bank and account type' : institution !== 'Other' ? 'Bank from filename' : 'Bank not detected';
   const typeEvidence = cardSignal !== bankSignal ? 'account type from file contents' : cardSignal ? 'conflicting account types; confirm selection'
     : fileCard !== fileBank ? 'account type from filename' : institution === 'American Express' ? 'credit card assumed for Amex' : 'account type not detected; confirm selection';
   return { institution, accountKind, detectionNote: bankEvidence + '; ' + typeEvidence + '.' };
@@ -88,7 +99,10 @@ export function parseCsvText(text: string): {
   skipped: number;
 } {
   const { grid, headerIndex } = inspectCsv(text);
-  const parsed = Papa.parse<Record<string, string>>(Papa.unparse(grid.slice(headerIndex)), {
+  const importGrid = headerIndex < 0 && isHeaderlessAccountCsv(grid)
+    ? [['Date', 'Description', 'Debit', 'Credit', 'Balance'], ...grid]
+    : grid.slice(Math.max(0, headerIndex));
+  const parsed = Papa.parse<Record<string, string>>(Papa.unparse(importGrid), {
     header: true,
     skipEmptyLines: 'greedy',
     transformHeader: (header) => header.trim(),

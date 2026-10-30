@@ -74,7 +74,7 @@ export function TransactionsPanel({
             setNotice('Suggestions refreshed for ' + monthLabel + '. Manual categories were kept. Previously uploaded sheet rows stay unchanged.');
           }}>Refresh suggestions</button>
           <div className="search-box"><span>⌕</span><input aria-label="Search transactions" placeholder="Search merchant…" value={search} onChange={(event) => setSearch(event.target.value)} /></div>
-          <select className={'filter-select category-tone-' + categoryGroup(categoryFilter)} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+          <select className={'filter-select category-tone-' + categoryGroup(categoryFilter) + (categoryFilter === 'All categories' ? ' all-categories-filter' : '')} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option>All categories</option><CategoryOptions filterMode />
           </select>
           <button className="icon-button export-button" title="Export combined CSV" onClick={downloadCsv}>↓</button>

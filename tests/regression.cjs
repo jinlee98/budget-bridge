@@ -35,6 +35,20 @@ assert.equal(simple.rows[0].amount, 12.5);
 assert.equal(simple.rows[0].externalId, '');
 assert.equal(simple.rows[0].signNormalized, false);
 
+const tdHeaderless = '10/01/2026,"Example shop, branch",12.50,,987.50\n10/02/2026,Example deposit,,100.00,1087.50';
+const tdParsed = parseCsvText(tdHeaderless);
+assert.equal(tdParsed.rows.length, 2);
+assert.equal(tdParsed.skipped, 0);
+assert.equal(tdParsed.rows[0].date, '2026-10-01');
+assert.equal(tdParsed.rows[0].description, 'Example shop, branch');
+assert.equal(tdParsed.rows[0].amount, -12.5);
+assert.equal(tdParsed.rows[1].amount, 100);
+assert.equal(tdParsed.rows[0].signNormalized, true);
+assert.equal(context.exports.detectImportSource(tdHeaderless, 'accountactivity (1).csv', false).institution, 'TD');
+assert.equal(context.exports.detectImportSource(tdHeaderless, 'accountactivity.csv', false).accountKind, 'bank');
+assert.equal(context.exports.detectImportSource(tdHeaderless, 'other.csv', false).institution, 'Other');
+assert.equal(context.exports.isHeaderlessAccountCsv([['Date', 'Description', 'Amount', '', 'Balance']]), false);
+
 const ofx = parseOfx('<OFX><CURDEF>CAD<ACCTID>1234<BANKTRANLIST><STMTTRN><DTPOSTED>20261001<TRNAMT>-12.50<FITID>abc<NAME>Shop</STMTTRN></BANKTRANLIST></OFX>');
 assert.equal(ofx.rows[0].amount, -12.5);
 assert.equal(ofx.rows[0].externalId, 'abc');
