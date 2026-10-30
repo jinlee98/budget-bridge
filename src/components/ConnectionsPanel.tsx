@@ -50,7 +50,7 @@ export function ConnectionsPanel({
   syncToSheet,
 }: Props) {
   return (<>
-    <section className={`panel connection-panel ${activeTab === 'transactions' ? 'view-hidden' : ''}`} id="connections">
+    <section className={`panel connection-panel ${activeTab !== 'connections' ? 'view-hidden' : ''}`} id="connections">
       <div className="panel-heading">
         <div><div className="section-kicker">STEP 03 · YOUR DESTINATION</div><h2>Connect Google Sheets</h2></div>
         <div className={sheetTitle ? 'connection-indicator connected' : 'connection-indicator'}><span></span>{sheetTitle ? 'CONNECTED' : 'OPTIONAL'}</div>

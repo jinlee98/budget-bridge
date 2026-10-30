@@ -129,6 +129,9 @@ h1 { font: 700 32px/1.25 'Manrope', sans-serif; letter-spacing: -1.2px; color: v
 
 .content-grid { display: grid; grid-template-columns: minmax(0, 1.03fr) minmax(0, .97fr); gap: 14px; margin: 15px 0; align-items: stretch; }
 .content-grid.connections-mode { grid-template-columns: minmax(0, 1fr); }
+.content-grid:not(.connections-mode) { grid-template-columns: minmax(0, 1fr); }
+.connection-shortcut { padding: 0; border: 0; background: transparent; color: var(--text-secondary); font: inherit; text-decoration: underline; text-underline-offset: 3px; text-align: left; }
+.connection-shortcut:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .view-hidden { display: none !important; }
 .panel { background: #fff; border: 1px solid #e6eae3; border-radius: 9px; box-shadow: 0 3px 12px #283a3005; }
 .import-panel, .connection-panel { padding: 18px 19px 16px; }
@@ -467,4 +470,51 @@ th, td { padding-top: 12px; padding-bottom: 12px; }
   .table-tools { gap: 8px; }
   .search-box { width: 100%; min-width: 140px; }
   .filter-select { max-width: 190px; }
+}
+
+/* Smaller laptops need room for the larger type without desktop-sized gutters. */
+@media (min-width: 901px) and (max-width: 1440px) {
+  .sidebar { width: 232px; padding: 22px 14px 16px; }
+  .main-content { margin-left: 232px; min-width: 0; }
+  .brand { gap: 8px; padding: 0 0 28px; }
+  .brand-name { font-size: 19px; }
+  .nav-item { gap: 10px; padding: 0 10px; }
+  .privacy-card { padding: 12px; margin-bottom: 12px; }
+  .privacy-card p { font-size: 13px; }
+  .topbar { height: 54px; padding: 0 24px; }
+  .page-wrap { padding: 24px 24px 20px; }
+  .welcome-row { gap: 16px; margin-bottom: 18px; }
+  h1 { font-size: 28px; letter-spacing: -.8px; }
+  .subtitle { max-width: 580px; font-size: 14px; line-height: 1.5; }
+  .step-strip { gap: 12px; padding: 10px 14px; min-height: 62px; }
+  .step { min-width: 140px; }
+  .step-note { display: none; }
+  .stats-grid { gap: 10px; margin: 12px 0; }
+  .stat-card { min-height: 96px; padding: 12px 14px; }
+  .stat-financial, .stat-spend { min-height: 118px; }
+  .stat-top { font-size: 11px; letter-spacing: .4px; }
+  .stat-number { margin: 8px 0 6px; font-size: 22px; }
+  .stat-sheet { font-size: 17px; }
+  .stat-foot { font-size: 12px; white-space: normal; line-height: 1.45; }
+  .content-grid { margin: 12px 0; }
+  .drop-zone { min-height: 150px; margin-top: 12px; }
+  .bank-links { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .bank-links a { font-size: 12px; }
+  .ledger-heading { flex-direction: column; align-items: stretch; gap: 14px; }
+  .table-tools { width: 100%; gap: 8px; }
+  .search-box { flex: 1 1 180px; min-width: 180px; }
+  .filter-select { flex: 0 1 190px; }
+  .pending-file { grid-template-columns: 35px minmax(150px, 1fr) minmax(120px, .7fr) minmax(120px, .7fr); }
+  .file-row-actions { grid-column: 2 / -1; justify-content: flex-end; }
+  .sync-footer { flex-wrap: wrap; align-items: center; gap: 12px; }
+  .sync-footer > span { flex: 1 1 360px; font-size: 12px; }
+}
+@media (min-width: 901px) and (max-width: 1180px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bank-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-height: 800px) and (min-width: 621px) {
+  .sidebar { overflow-y: auto; }
+  .sidebar-spacer { min-height: 16px; }
+  .privacy-card { margin-top: 16px; }
 }

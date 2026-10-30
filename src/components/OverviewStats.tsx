@@ -5,6 +5,7 @@ type Props = Pick<
   | 'transactions'
   | 'pending'
   | 'activeTab'
+  | 'setActiveTab'
   | 'monthTransactions'
   | 'monthLabel'
   | 'spending'
@@ -16,6 +17,7 @@ export function OverviewStats({
   transactions,
   pending,
   activeTab,
+  setActiveTab,
   monthTransactions,
   monthLabel,
   spending,
@@ -58,7 +60,7 @@ export function OverviewStats({
       <div className="stat-card">
         <div className="stat-top"><span>SHEET CONNECTION</span><span className="stat-icon">↗</span></div>
         <div className="stat-number stat-sheet">{sheetTitle || 'Not connected'}</div>
-        <div className="stat-foot"><span className={sheetTitle ? 'stat-marker green' : 'stat-marker muted'}></span> {sheetTitle ? 'Ready to receive updates' : 'Connect when you’re ready'}</div>
+        <div className="stat-foot"><span className={sheetTitle ? 'stat-marker green' : 'stat-marker muted'}></span> <button className="connection-shortcut" onClick={() => setActiveTab('connections')}>{sheetTitle ? 'Manage connection & upload' : 'Connect Google Sheets'}</button></div>
       </div>
     </section>
   </>);
