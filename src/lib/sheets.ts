@@ -25,9 +25,11 @@ export function templateCategory(category: string, description: string, incomeCa
       return inferred;
     return incomeCategories.includes('Other') ? 'Other' : (incomeCategories[0] ?? 'Other');
   }
-  if (sheetCategory(category) === 'Food / Groceries')
-    return expenseCategories.find((label) => normalizeText(sheetCategory(label)) === normalizeText('Food / Groceries')) ?? 'Food / Groceries';
-  return category === 'Uncategorized' ? 'Other' : sheetCategory(category);
+  const desired = category === 'Uncategorized' ? 'Other' : sheetCategory(category);
+  const match = expenseCategories.find((label) => normalizeText(label) === normalizeText(desired));
+  if (match) return match;
+  if (expenseCategories.length) throw new Error('Expense category "' + desired + '" is missing from Summary. Update your budget copy to match the app categories before uploading.');
+  return desired;
 }
 
 export function discoverTransactionSections(grid: string[][]): TransactionSection[] {
@@ -90,7 +92,7 @@ export function findFoodCategoryRepairs(grid: string[][], sections: TransactionS
     for (let r = section.headerRow + 1; r < grid.length; r += 1) {
       const row = grid[r] ?? [];
       const category = String(row[section.columns.category] ?? '').trim();
-      if (normalizeText(category) === 'food' && foodCategory !== category && parseDate(row[section.columns.date]).slice(0, 7) === month) {
+      if (normalizeText(category) === 'food groceries' && foodCategory !== category && parseDate(row[section.columns.date]).slice(0, 7) === month) {
         repairs.push({ range: 'Transactions!' + columnName(section.columns.category) + (r + 1), values: [[foodCategory]] });
       }
     }
@@ -100,7 +102,7 @@ export function findFoodCategoryRepairs(grid: string[][], sections: TransactionS
 
 export const SUMMARY_LAYOUT: SummaryLayout = {
   startingBalanceCell: 'L8',
-  expense: { firstRow: 28, lastRow: 38, labelCol: 1, plannedCol: 3 },
+  expense: { firstRow: 28, lastRow: 41, labelCol: 1, plannedCol: 3 },
   income: { firstRow: 28, lastRow: 33, labelCol: 7, plannedCol: 9 },
 };
 

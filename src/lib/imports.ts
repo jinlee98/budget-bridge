@@ -27,7 +27,7 @@ export function inspectCsv(text: string) {
 // TD's accountactivity download omits headers: date, description, debit, credit, balance.
 export function isHeaderlessAccountCsv(grid: string[][]): boolean {
   const valid = (row: string[]) => row.length === 5 &&
-    /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(row[0].trim()) && Boolean(parseDate(row[0])) && Boolean(row[1].trim()) &&
+    /^(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(row[0].trim()) && Boolean(parseDate(row[0])) && Boolean(row[1].trim()) &&
     (!row[2].trim() || parseMoney(row[2]) !== null) && (!row[3].trim() || parseMoney(row[3]) !== null) &&
     (parseMoney(row[2]) !== null || parseMoney(row[3]) !== null) && parseMoney(row[4]) !== null;
   return grid.length > 0 && valid(grid[0]) && grid.filter(valid).length >= grid.length * 0.8;
@@ -48,7 +48,7 @@ export function detectImportSource(text: string, fileName: string, isOfx: boolea
   }
   else {
     const { grid, headerIndex } = inspectCsv(text);
-    tdAccountLayout = headerIndex < 0 && isHeaderlessAccountCsv(grid) && /^accountactivity(?:[\s(\d)]*)\.csv$/i.test(fileName);
+    tdAccountLayout = headerIndex < 0 && isHeaderlessAccountCsv(grid) && /^(?:accountactivity|chequeing|chequing|checking)(?:[\s(\d)]*)\.csv$/i.test(fileName);
     headers = headerIndex >= 0 ? grid[headerIndex] ?? [] : [];
     metadata = headerIndex >= 0 ? grid.slice(0, headerIndex).flat() : [];
     const metadataColumns = headers.map((header, index) => /^(bank|bank name|institution|financial institution|account type|account name|card type|product|product name)$/.test(normalizeText(header)) ? index : -1).filter((index) => index >= 0);

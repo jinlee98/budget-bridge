@@ -48,6 +48,13 @@ assert.equal(context.exports.detectImportSource(tdHeaderless, 'accountactivity (
 assert.equal(context.exports.detectImportSource(tdHeaderless, 'accountactivity.csv', false).accountKind, 'bank');
 assert.equal(context.exports.detectImportSource(tdHeaderless, 'other.csv', false).institution, 'Other');
 assert.equal(context.exports.isHeaderlessAccountCsv([['Date', 'Description', 'Amount', '', 'Balance']]), false);
+const tdIso = '"2026-10-01","Example deposit",,"100.00","1100.00"\n"2026-10-02","Example debit","8.5",,"1091.50"';
+const tdIsoRows = parseCsvText(tdIso);
+assert.equal(tdIsoRows.rows.length, 2);
+assert.equal(tdIsoRows.rows[0].amount, 100);
+assert.equal(tdIsoRows.rows[1].amount, -8.5);
+assert.equal(tdIsoRows.rows[0].date, '2026-10-01');
+assert.equal(context.exports.detectImportSource(tdIso, 'chequeing.csv', false).institution, 'TD');
 
 const ofx = parseOfx('<OFX><CURDEF>CAD<ACCTID>1234<BANKTRANLIST><STMTTRN><DTPOSTED>20261001<TRNAMT>-12.50<FITID>abc<NAME>Shop</STMTTRN></BANKTRANLIST></OFX>');
 assert.equal(ofx.rows[0].amount, -12.5);
@@ -131,15 +138,15 @@ const categoryCases = [
   ['WestJet', -300, 'Travel'],
   ['AIRBNB RESERVATION', -120, 'Travel'],
   ['Hotel California', -200, 'Travel'],
-  ['Amazon Marketplace', -23, 'Personal'],
-  ['AMZN MKTP CA', -24, 'Personal'],
-  ['Starbucks #123', -6, 'Personal'],
-  ['UBER EATS', -25, 'Personal'],
+  ['Amazon Marketplace', -23, 'Shopping'],
+  ['AMZN MKTP CA', -24, 'Shopping'],
+  ['Starbucks #123', -6, 'Cafe'],
+  ['UBER EATS', -25, 'Food'],
   ['UBER TRIP', -18, 'Transportation'],
-  ['Whole Foods', -100, 'Food / Groceries'],
+  ['Whole Foods', -100, 'Groceries'],
   ['BC Hydro', -50, 'Utilities'],
   ['Rent', -1500, 'Home'],
-  ['Petsmart', -50, 'Pets'],
+  ['Petsmart', -50, 'Other'],
   ['Dental clinic', -100, 'Health/medical'],
   ['Flowers gift', -30, 'Gifts'],
   ['Amazon credit card payment', -300, 'Card payments'],
@@ -151,12 +158,12 @@ for (const [description, amount, expected] of categoryCases) {
   assert.equal(categorize(description, {}, amount).category, expected, description);
 }
 assert.equal(categorize('Starbucks', { starbucks: 'Gifts' }, -6).category, 'Gifts');
-assert.equal(categorize('Starbucks', { starbucks: 'Restaurants & Coffee' }, -6).category, 'Personal');
+assert.equal(categorize('Starbucks', { starbucks: 'Restaurants & Coffee' }, -6).category, 'Food');
 const learned = { ['merchant:' + merchantKey('POS Starbucks 123')]: 'Gifts' };
 assert.equal(categorize('POS Starbucks 456', learned, -6).category, 'Gifts');
-assert.equal(sheetCategory('Groceries'), 'Food / Groceries');
-assert.equal(sheetCategory('Food'), 'Food / Groceries');
-assert.equal(templateCategory('Food / Groceries', 'Whole Foods', []), 'Food / Groceries');
+assert.equal(sheetCategory('Groceries'), 'Groceries');
+assert.equal(sheetCategory('Food'), 'Food');
+assert.equal(templateCategory('Food / Groceries', 'Whole Foods', []), 'Groceries');
 assert.equal(context.exports.budgetImpact({ ...all.next[0], category: 'Income', incomeCategory: 'Paycheck', categorySource: 'Manual' }, {}), 'Income · not spending');
 assert.equal(sheetCategory('Savings & Investments'), 'Investments');
 assert.equal(templateCategory('Personal', 'Amazon', []), 'Personal');
@@ -306,7 +313,7 @@ console.log('Refund checks passed: selectable income category, spending reductio
 assert.equal(categorize('AMZN MKTP', {}, 25, 'card').incomeCategory, 'Refunds');
 assert.equal(categorize('Unknown merchant', {}, 25, 'card').incomeCategory, 'Refunds');
 assert.equal(categorize('AMZN MKTP', { 'amzn mktp': 'Personal' }, 25, 'card').incomeCategory, 'Refunds');
-assert.equal(categorize('AMZN MKTP', {}, -25, 'card').category, 'Personal');
+assert.equal(categorize('AMZN MKTP', {}, -25, 'card').category, 'Shopping');
 assert.equal(categorize('Unknown merchant', {}, 25, 'bank').category, 'Uncategorized');
 assert.equal(categorize('PAYMENT', {}, 25, 'card').category, 'Card payments');
 assert.equal(categorize('PAYMENT REVERSAL', {}, 25, 'card').incomeCategory, 'Refunds');
@@ -391,10 +398,10 @@ assert.equal(categoryGroup('group:income'), 'income');
 console.log('Group filter checks passed: selectable expense/income/bookkeeping groups, specific subcategories, separate uncategorized, and income-filter inclusion of refunds without income-total double counting.');
 
 const { SUMMARY_LAYOUT, summaryCategories, findFoodCategoryRepairs } = context.exports;
-const newSummary = Array.from({ length: 40 }, () => Array(12).fill(''));
+const newSummary = Array.from({ length: 44 }, () => Array(12).fill(''));
 newSummary[5][9] = 'Starting balance'; // Label is not beside the input.
 newSummary[7][11] = 123;
-const expenseLabels = ['Food / Groceries', 'Gifts', 'Health/medical', 'Home', 'Transportation', 'Personal', 'Pets', 'Utilities', 'Travel', 'Debt', 'Other'];
+const expenseLabels = ['Food', 'Gifts', 'Health/medical', 'Home', 'Transportation', 'Personal', 'Tuition / School', 'Utilities', 'Travel', 'Debt', 'Other', 'Shopping', 'Cafe', 'Groceries'];
 const incomeLabels = ['Savings', 'Paycheck', 'Bonus', 'Interest', 'Other', 'Refunds'];
 expenseLabels.forEach((label, index) => { newSummary[index + 27][1] = label; newSummary[index + 27][3] = 111; newSummary[index + 27][4] = '=SUM(Transactions!B:B)'; });
 incomeLabels.forEach((label, index) => { newSummary[index + 27][7] = label; newSummary[index + 27][9] = 222; });
@@ -411,15 +418,27 @@ assert.throws(() => findTemplatePlannedUpdates(newSummary, 'invalid', {}, {}, []
 assert.throws(() => findTemplatePlannedUpdates(newSummary, '', { Missing: '100' }, {}, [], SUMMARY_LAYOUT), /Could not find/);
 assert.equal(newSummary[7][11], 123);
 assert.equal(newSummary[27][4], '=SUM(Transactions!B:B)');
-assert.equal(summaryCategories(newSummary, 'expense', SUMMARY_LAYOUT)[0], 'Food / Groceries');
-assert.equal(templateCategory('Food / Groceries', '', [], undefined, ['Food / Groceries']), 'Food / Groceries');
-assert.equal(templateCategory('Food / Groceries', '', [], undefined, ['Food']), 'Food');
+assert.equal(summaryCategories(newSummary, 'expense', SUMMARY_LAYOUT)[0], 'Food');
+assert.equal(templateCategory('Groceries', '', [], undefined, expenseLabels), 'Groceries');
+assert.throws(() => templateCategory('Groceries', '', [], undefined, ['Food']), /missing from Summary/);
 const repairGrid = [['Date', 'Amount', 'Description', 'Category'], ['2026-10-01', '10', 'Shop', 'Food'], ['2026-09-30', '12', 'Shop', 'Food'], ['2026-10-02', '13', 'Shop', 'Food / Groceries']];
 const repairSections = discoverTransactionSections(repairGrid);
-const repairs = findFoodCategoryRepairs(repairGrid, repairSections, '2026-10', 'Food / Groceries');
+const repairs = findFoodCategoryRepairs(repairGrid, repairSections, '2026-10', 'Groceries');
 assert.equal(repairs.length, 1);
-assert.equal(repairs[0].range, 'Transactions!D2');
-assert.equal(repairs[0].values[0][0], 'Food / Groceries');
+assert.equal(repairs[0].range, 'Transactions!D4');
+assert.equal(repairs[0].values[0][0], 'Groceries');
 assert.equal(repairGrid[1][1], '10');
-assert.equal(findFoodCategoryRepairs(repairGrid, repairSections, '2026-10', 'Food').length, 0);
+assert.equal(findFoodCategoryRepairs(repairGrid.slice(0, 3), repairSections, '2026-10', 'Groceries').length, 0);
 console.log('New template checks passed: confirmed L8/D28:D38/J28:J33 targets, category-label aliases, blanks and zero, validation, formula preservation, category discovery, and in-place selected-month Food repair.');
+
+assert.equal(context.exports.CATEGORIES.filter((category) => category !== 'Income').join('|'), expenseLabels.join('|'));
+assert.equal(categorize('University tuition', {}, -500).category, 'Tuition / School');
+assert.equal(categorize('UBC bookstore', {}, -50).category, 'Tuition / School');
+assert.equal(categorize('AMAZON PRIME', {}, -10).category, 'Personal');
+assert.equal(categorize('Cafe shop', {}, -6).category, 'Cafe');
+assert.equal(categorize('Whole Foods', {}, -50).category, 'Groceries');
+assert.equal(categorize('Restaurant', {}, -25).category, 'Food');
+assert.equal(sheetCategory('Shopping'), 'Shopping');
+assert.equal(sheetCategory('Food / Groceries'), 'Groceries');
+const groceryPlan = findTemplatePlannedUpdates(newSummary, '', { Groceries: '200', Cafe: '50', Shopping: '100' }, {}, [], SUMMARY_LAYOUT);
+assert.equal(groceryPlan.map((entry) => entry.range).join('|'), 'Summary!D41|Summary!D40|Summary!D39');

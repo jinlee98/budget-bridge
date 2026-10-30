@@ -29,7 +29,7 @@ The month picker controls the overview, transaction list, category refresh, and 
 
 ## Categories and totals
 
-- **Expenses:** Food / Groceries, Gifts, Health/medical, Home, Transportation, Personal, Pets, Utilities, Travel, Debt, Other.
+- **Expenses:** Food, Gifts, Health/medical, Home, Transportation, Personal, Tuition / School, Utilities, Travel, Debt, Other, Shopping, Cafe, Groceries.
 - **Income:** Paycheck, Bonus, Interest, Other, Refunds.
 - **Bookkeeping:** Card payments, Savings transfers, Investments, Transfers & Payments.
 
@@ -63,9 +63,9 @@ Make an editable copy of the [Budget Bridge template](https://docs.google.com/sp
 - **Imported Ledger:** all selected-month rows, including bookkeeping. Created automatically if missing.
 - **Shared Expenses:** full charge, people in the split including you, each person's share, and the amount others owe.
 
-Shared purchases keep their full charge in expenses. Income and bookkeeping entries are excluded from shared-expense tracking. Uploads check existing keys and budget rows to avoid duplicates. Local category edits generally do not rewrite previously uploaded rows; legacy Food labels are repaired to Food / Groceries for the selected month when required by the template.
+Shared purchases keep their full charge in expenses. Income and bookkeeping entries are excluded from shared-expense tracking. Uploads check existing keys and budget rows to avoid duplicates. Local category edits generally do not rewrite previously uploaded rows; legacy Food / Groceries labels are repaired to Groceries for the selected month. Food remains a separate category. The connected sheet must contain the current expense labels; missing labels stop the upload.
 
-Optional setup writes starting balance to **Summary!L8**, planned expenses within **D28:D38**, and planned income within **J28:J33**, matched by category label. Blank fields leave existing values unchanged; zero is an explicit update. Invalid amounts or missing categories stop the upload before transaction writes.
+Optional setup writes starting balance to **Summary!L8**, planned expenses within **D28:D41**, and planned income within **J28:J33**, matched by category label. Blank fields leave existing values unchanged; zero is an explicit update. Invalid amounts or missing categories stop the upload before transaction writes.
 
 ### OAuth setup
 

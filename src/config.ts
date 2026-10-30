@@ -19,8 +19,8 @@ export const HEADERS = [
 
 export const DEFAULT_EXPENSE_PLANS = [
   'Food', 'Gifts', 'Health/medical', 'Home',
-  'Transportation', 'Personal', 'Pets', 'Utilities', 'Travel', 'Debt',
-  'Other',
+  'Transportation', 'Personal', 'Tuition / School', 'Utilities', 'Travel', 'Debt',
+  'Other', 'Shopping', 'Cafe', 'Groceries',
 ];
 
 export const DEFAULT_INCOME_PLANS = [

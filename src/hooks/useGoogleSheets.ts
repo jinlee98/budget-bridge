@@ -196,7 +196,7 @@ export function useGoogleSheets({ reviewedMonthTransactions, month, monthLabel, 
         const setupUpdates = findTemplatePlannedUpdates(summaryValues, startingBalance, plannedExpenses, plannedIncome, [], SUMMARY_LAYOUT);
         const incomeCategories = summaryCategories(summaryValues, 'income', SUMMARY_LAYOUT);
         const expenseCategories = summaryCategories(summaryValues, 'expense', SUMMARY_LAYOUT);
-        const foodCategory = templateCategory('Food / Groceries', '', incomeCategories, undefined, expenseCategories);
+        const foodCategory = templateCategory('Groceries', '', incomeCategories, undefined, expenseCategories);
         const transactionGrid = await sheetsRequest('spreadsheets/' + encodeURIComponent(spreadsheetId) + '/values/Transactions!A:Z', token) as {
           values?: string[][];
         };
@@ -427,7 +427,7 @@ export function useGoogleSheets({ reviewedMonthTransactions, month, monthLabel, 
       if (sharedRowsAdded)
         parts.push(sharedRowsAdded + ' shared expense' + (sharedRowsAdded === 1 ? '' : 's') + ' added');
       if (categoryRowsFixed)
-        parts.push(categoryRowsFixed + ' Food categories corrected');
+        parts.push(categoryRowsFixed + ' legacy grocery categories corrected');
       if (setupCellsUpdated)
         parts.push(setupCellsUpdated + ' budget setup cells updated');
       setSyncMessage(monthLabel + ': ' + (parts.join(' · ') || 'Everything is already in the sheet.'));

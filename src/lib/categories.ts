@@ -1,21 +1,20 @@
 import type { AccountKind, CategorySource, IncomeCategory, Transaction } from '../types';
-import { DEFAULT_INCOME_PLANS } from '../config';
+import { DEFAULT_EXPENSE_PLANS, DEFAULT_INCOME_PLANS } from '../config';
 import { inferAccountKind } from './accounts';
 import { normalizeText } from './format';
 
 export const INCOME_CATEGORIES = [...DEFAULT_INCOME_PLANS, 'Refunds'] as const;
 
 export const CATEGORIES = [
-  'Food / Groceries', 'Gifts', 'Health/medical', 'Home', 'Transportation', 'Personal',
-  'Pets', 'Utilities', 'Travel', 'Debt', 'Other', 'Income',
+  ...DEFAULT_EXPENSE_PLANS, 'Income',
 ];
 
 export const BOOKKEEPING_CATEGORIES = ['Card payments', 'Savings transfers', 'Investments', 'Transfers & Payments'];
 
 export const LEGACY_CATEGORIES: Record<string, string> = {
-  'Food': 'Food / Groceries', 'Groceries': 'Food / Groceries', 'Restaurants & Coffee': 'Personal',
+  'Food / Groceries': 'Groceries', 'Restaurants & Coffee': 'Food', 'Pets': 'Other',
   'Bills & Utilities': 'Utilities', 'Housing': 'Home',
-  'Shopping': 'Personal', 'Subscriptions': 'Personal',
+  'Subscriptions': 'Personal',
   'Health': 'Health/medical', 'Entertainment': 'Personal',
   'Savings & Investments': 'Investments', 'Fees & Interest': 'Debt',
   'Savings': 'Savings transfers', 'Income:Savings': 'Savings transfers',
@@ -29,14 +28,18 @@ export const CATEGORY_RULES: {
     { category: 'Investments', pattern: /\b(investment|investments|investing|questrade|wealthsimple|tfsa|fhsa|rrsp|brokerage)\b/ },
     { category: 'Debt', pattern: /\b(loan|loans|student loan|line of credit|loc payment|debt|mortgage|interest charged|interest charge|finance charge|annual fee|bank fee|overdraft fee)\b/ },
     { category: 'Travel', pattern: /\b(travel|hotel|hotels|motel|resort|airbnb|vrbo|flight|flights|airline|airlines|airways|air canada|westjet|porter|flair|air transat|lufthansa|expedia|booking com|hilton|marriott|hyatt|fairmont)\b/ },
-    { category: 'Pets', pattern: /\b(pet|pets|petco|petsmart|pet valu|veterinary|veterinarian|vet clinic)\b/ },
+    { category: 'Other', pattern: /\b(pet|pets|petco|petsmart|pet valu|veterinary|veterinarian|vet clinic)\b/ },
+    { category: 'Tuition / School', pattern: /\b(tuition|school|university|college|textbook|textbooks|student fees|campus|ubc|sfu|bcit|kpu|langara)\b/ },
     { category: 'Health/medical', pattern: /\b(health|medical|dental|dentist|pharmacy|physiotherapy|physio|optometrist|hospital|clinic|shoppers drug mart|london drugs)\b/ },
     { category: 'Utilities', pattern: /\b(telus|rogers|bell canada|fido|koodo|freedom mobile|shaw|fortisbc|bc hydro|hydro|utility|utilities|internet|electricity|water bill)\b/ },
     { category: 'Home', pattern: /\b(rent|rental payment|strata|home depot|home hardware|ikea|property tax|home insurance)\b/ },
     { category: 'Gifts', pattern: /\b(gift|gifts|florist|flowers|donation|charity)\b/ },
     { category: 'Personal', pattern: /\b(game|games|gaming|gamestop|steam|steampowered|valve|nintendo|playstation|xbox|epic games|riot games|blizzard|ubisoft|electronic arts|ea games)\b/ },
-    { category: 'Food / Groceries', pattern: /\b(grocery|groceries|supermarket|save on foods|t t supermarket|whole foods|costco|safeway|sobeys|loblaws|superstore|no frills|walmart grocery|freshco|farm boy)\b/ },
-    { category: 'Personal', pattern: /\b(amazon|amzn|walmart|target|dollarama|dollar tree|canadian tire|best buy|winners|homesense|uniqlo|sephora|store|stores|shopping|retail|restaurant|restaurants|cafe|cafes|coffee|starbucks|tim hortons|mcdonalds|mcdonald s|uber eats|ubereats|doordash|skip the dishes|skipthedishes|a w|subway|pizza|sushi|bakery|bistro|grill|kitchen|diner|bar|pub|spotify|netflix|disney|amazon prime|apple com bill)\b/ },
+    { category: 'Groceries', pattern: /\b(grocery|groceries|supermarket|save on foods|t t supermarket|whole foods|costco|safeway|sobeys|loblaws|superstore|no frills|walmart grocery|freshco|farm boy|h mart)\b/ },
+    { category: 'Cafe', pattern: /\b(cafe|cafes|coffee|starbucks|tim hortons|tea|bubble tea|pearl fever|alfa tea)\b/ },
+    { category: 'Food', pattern: /\b(restaurant|restaurants|mcdonalds|mcdonald s|uber eats|ubereats|doordash|skip the dishes|skipthedishes|a w|subway|pizza|pizz|sushi|bakery|bistro|grill|kitchen|diner|bar|pub|pho|cactus club|haidilao|hotpot|noodle|burger)\b/ },
+    { category: 'Personal', pattern: /\b(spotify|netflix|disney|amazon prime|apple com bill|youtube|youtubepremium|hair salon|barber)\b/ },
+    { category: 'Shopping', pattern: /\b(amazon|amzn|walmart|target|dollarama|dollar tree|canadian tire|best buy|winners|homesense|uniqlo|sephora|store|stores|shopping|retail)\b/ },
     { category: 'Transportation', pattern: /\b(shell|chevron|esso|petro canada|translink|compass card|uber|lyft|taxi|parking|impark|easypark|transit|gas station|icbc)\b/ },
   ];
 
